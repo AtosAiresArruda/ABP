@@ -20,8 +20,9 @@ ABP *removeNoABP(ABP **raiz, int k);
 
 
 //Metodos de busca
-ABP *buscaBinariaMenor(ABP **raiz);
-ABP *buscaBinariaMaior(ABP **raiz);
+ABP *buscaBinariaSimples(ABP **raiz, int k); //Retorna ponteiro para o no que contem k;
+ABP *buscaBinariaMenor(ABP **raiz);          //Retorna ponteiro para o no que tem menor valor na arovre;
+ABP *buscaBinariaMaior(ABP **raiz);          //Retorna ponteiro para o no que tem maior valor na arvore;
 
 // Funções de relatorio
 void imprimeABP(ABP *raiz);
@@ -40,7 +41,12 @@ int main(){
 	insereNoABP(&raiz, 12);
 	insereNoABP(&raiz, 40);
 	insereNoABP(&raiz, 3);
-	imprimeABP(raiz);
+
+	ABP *busca = buscaBinariaSimples(&raiz, 4);
+
+
+	printf("\n %d \n", busca->chave);
+	//imprimeABP(raiz);
 	return 0;
 }
 
@@ -97,6 +103,8 @@ ABP *buscaBinariaMenor(ABP **raiz){
 		return buscaBinariaMenor(&((*raiz)->esq));
 }
 
+
+
 ABP *buscaBinariaMaior(ABP **raiz){
 	assert(raiz);
 	if(!(*raiz)) //Entrada Vazia? 
@@ -108,4 +116,28 @@ ABP *buscaBinariaMaior(ABP **raiz){
 		return buscaBinariaMenor(&((*raiz)->dir));
 }
 
-ABP *removeNoABP(ABP **raiz, int k);
+ABP *buscaBinariaSimples(ABP **raiz, int k){
+	//Tratamentos basico;
+	assert(raiz);
+	if(!(*raiz)) // OU arovre vazia OU k nao esta na arvore;
+		return NULL;
+
+	if ((*raiz)->chave == k) //Encontrou? retorne;
+		return *raiz;
+	if ((*raiz)->chave >= k) //E menor? 
+		return buscaBinariaSimples(&((*raiz)->esq), k);
+	else					 //E maior?
+		return buscaBinariaSimples(&((*raiz)->dir), k);
+}
+
+ABP *removeNoABP(ABP **raiz, int k){
+	//Tratamentos basicos;
+	assert(raiz);
+	if(!(*raiz))
+		return NULL;
+
+	ABP *aux = buscaBinariaSimples(&(*raiz), k);
+
+
+
+}
