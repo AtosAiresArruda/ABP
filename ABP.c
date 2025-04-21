@@ -16,11 +16,11 @@ typedef struct ABP
 ABP* criaNoABP(int k);
 //Altera elemento(s) na ABP
 ABP **insereNoABP(ABP **raiz, int k);
-ABP *removeNoABP(ABP **raiz, int k);
+void removeNoABP(ABP **raiz, int k);
 
 
 //Metodos de busca
-ABP *buscaBinariaSimples(ABP **raiz, int k); //Retorna ponteiro para o no que contem k;
+ABP **buscaBinariaSimples(ABP **raiz, int k); //Retorna ponteiro para o no que contem k;
 ABP *buscaBinariaMenor(ABP **raiz);          //Retorna ponteiro para o no que tem menor valor na arovre;
 ABP *buscaBinariaMaior(ABP **raiz);          //Retorna ponteiro para o no que tem maior valor na arvore;
 
@@ -42,11 +42,14 @@ int main(){
 	insereNoABP(&raiz, 40);
 	insereNoABP(&raiz, 3);
 
-	ABP *busca = buscaBinariaSimples(&raiz, 4);
+	imprimeABP(raiz);
 
 
-	printf("\n %d \n", busca->chave);
-	//imprimeABP(raiz);
+	removeNoABP(&raiz, 4);
+
+
+	//printf("\n %d \n", busca->chave);
+	imprimeABP(raiz);
 	return 0;
 }
 
@@ -116,28 +119,54 @@ ABP *buscaBinariaMaior(ABP **raiz){
 		return buscaBinariaMenor(&((*raiz)->dir));
 }
 
-ABP *buscaBinariaSimples(ABP **raiz, int k){
+ABP **buscaBinariaSimples(ABP **raiz, int k){
 	//Tratamentos basico;
 	assert(raiz);
 	if(!(*raiz)) // OU arovre vazia OU k nao esta na arvore;
 		return NULL;
 
 	if ((*raiz)->chave == k) //Encontrou? retorne;
-		return *raiz;
+		return raiz;
 	if ((*raiz)->chave >= k) //E menor? 
 		return buscaBinariaSimples(&((*raiz)->esq), k);
 	else					 //E maior?
 		return buscaBinariaSimples(&((*raiz)->dir), k);
 }
 
-ABP *removeNoABP(ABP **raiz, int k){
+
+void removeNoABP(ABP **raiz, int k){
 	//Tratamentos basicos;
 	assert(raiz);
 	if(!(*raiz))
-		return NULL;
+		return;
+	//Busca pelo ponteiro que aponta para k;
+	ABP **p = buscaBinariaSimples(raiz, k);
 
-	ABP *aux = buscaBinariaSimples(&(*raiz), k);
+	//tratamentos basicos;
+	assert(p);
+	if((*p) == NULL) //No nao foi encontrado, volte;
+		return;
 
+	if((*p)->dir == NULL && (*p)->esq == NULL){ //O no desejado e um no folha? Se sim, remova-o;
+		free(*p);
+		*p = NULL;
+		return;
+	}
 
+	ABP *filho = NULL; // Ponteiro auxiliar para remoção;
+	if(((*p)->dir == NULL) != ((*p)->esq == NULL)){//O no desejado tem apenas um filho? Se sim, veja qual filho e
+												   //salve, remova-o e coloque o filho no lugar;
+		filho = ((*p)->esq == NULL) ?
+			(*p)->dir : (*p)->esq;
+		
+		free(*p);
+		*p = filho; 
+		return;
+	}
+	//Aqui eu Optei por pegar o maior entre os menores de k, porem poderia ter feito filho = buscaBinariaMenor((*p)->dir);
+	filho = buscaBinariaMaior(&((*p)->esq));
 
+	(*p)->chave = filho->chave;
+	removeNoABP(&filho, filho->chave);
+	return;
 }
